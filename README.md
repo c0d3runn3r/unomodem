@@ -43,7 +43,7 @@ You will need to set the SSID and password for your wifi network by connecting t
     AT+SAVE
     AT+RST
     ```
-4. Once connected to the network, you can use AT+CIPSTART, AT+CIPCLOSE, etc to conduct your business.
+4. Once connected to the network, the LED will change from a slow blink to steady on and you will now be able to use `AT+CIPSTART`, `AT+CIPCLOSE`, etc to conduct your business.  Since it is emulating a SIM7000A, you can use the same AT commands you would with a real SIM7000A.  LTE is not supported, but it will play along with some LTE style commands (`AT+CIICR`, etc) without complaint.
 
 ## Contributing
 Hit me up with what you want to do.  I'm open to suggestions.

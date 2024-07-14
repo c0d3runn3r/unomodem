@@ -188,14 +188,30 @@ void setup() {
 void loop() {
 
 	// Check elapsed time and reconnect to WiFi if necessary
-	static unsigned long previousMillis = 0;
-	unsigned long elapsedMillis = millis() - previousMillis;
+	static unsigned long wifiReconnect = millis();
+	static unsigned long ledBlink = millis();
+	unsigned long currentMillis = millis();
+	unsigned long elapsedWifiReconnect = currentMillis - wifiReconnect;
+	unsigned long elapsedLedBlink = currentMillis - ledBlink;
 
-	if (elapsedMillis >= WIFI_RECONNECT_INTERVAL) {
-		previousMillis = millis();
+	if (elapsedWifiReconnect >= WIFI_RECONNECT_INTERVAL) {
+		wifiReconnect = currentMillis;
 		if (WiFi.status() != WL_CONNECTED) {
 			Serial.println(F("WiFi connection lost. Reconnecting..."));
 			connectToWiFi();
+		}
+	}
+
+	// Blink the LED every second if we are not connected to WiFi, otherwise keep it on
+	if(elapsedLedBlink >= 1000) {
+
+		ledBlink = currentMillis;
+
+		// Blink the LED if we are not connected to WiFi
+		if (WiFi.status() != WL_CONNECTED) {
+			digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+		} else {
+			digitalWrite(LED_BUILTIN, HIGH);
 		}
 	}
 
@@ -259,7 +275,7 @@ void handleATCommand(String command) {
     Serial.println(F("Sent response: OK"));
 
 	// AT+CWJAP sets the SSID and password
-  } else if (command.startsWith("AT+CWJAP") {
+  } else if (command.startsWith("AT+CWJAP")) {
 
 	// Parse the SSID and password parameters
 	int firstQuote = command.indexOf('"');
@@ -279,7 +295,8 @@ void handleATCommand(String command) {
   } else if (command == "AT+SAVE") {
 
 	// Save the configuration to EEPROM
-	saveConfig();
+    EEPROM.put(0, ssid);
+    EEPROM.put(MAX_SSID_LENGTH + 1, password);
 	Serial1.println(F("OK"));
 	Serial.println(F("Sent response: OK"));
  
@@ -305,10 +322,12 @@ void handleATCommand(String command) {
   } else if (command == "AT+CIPSTATUS") {
     if (WiFi.status() == WL_CONNECTED) {
       Serial1.println(F("STATE: CONNECT OK"));
+	  Serial.println(F("Sent response: STATE: CONNECT OK"));
     } else {
       Serial1.println(F("STATE: IP INITIAL"));
+	  Serial.println(F("Sent response: STATE: IP INITIAL"));
     }
-    Serial.println(F("Sent response: CIPSTATUS"));
+
   } else if (command == "AT+CIICR") {
     Serial1.println(F("OK"));
     Serial.println(F("Sent response: OK"));
