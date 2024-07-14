@@ -29,7 +29,7 @@ public:
     Serial.println(F("*********************************"));
     Serial.println(F("*           UnoModem            *"));
 	Serial.println(F("*                               *"));
-    Serial.println(F("*  coderunner@novadynamics.com  *"));
+    Serial.println(F("*      Author: c0d3runn3r		  *"));
     Serial.println(F("* Copyright (c) 2024 DaxBot Inc *"));
     Serial.println(F("*********************************"));
     Serial.println();
@@ -257,6 +257,32 @@ void handleATCommand(String command) {
   if (command == "AT") {
     Serial1.println(F("OK"));
     Serial.println(F("Sent response: OK"));
+
+	// AT+CWJAP sets the SSID and password
+  } else if (command.startsWith("AT+CWJAP") {
+
+	// Parse the SSID and password parameters
+	int firstQuote = command.indexOf('"');
+	int secondQuote = command.indexOf('"', firstQuote + 1);
+	String newSSID = command.substring(firstQuote + 1, secondQuote);
+	int thirdQuote = command.indexOf('"', secondQuote + 1);
+	int fourthQuote = command.indexOf('"', thirdQuote + 1);
+	String newPassword = command.substring(thirdQuote + 1, fourthQuote);
+
+	// Set the new SSID and password
+	newSSID.toCharArray(ssid, MAX_SSID_LENGTH + 1);
+	newPassword.toCharArray(password, MAX_PASSWORD_LENGTH + 1);
+
+	Serial1.println(F("OK"));
+	Serial.println(F("Sent response: OK"));
+
+  } else if (command == "AT+SAVE") {
+
+	// Save the configuration to EEPROM
+	saveConfig();
+	Serial1.println(F("OK"));
+	Serial.println(F("Sent response: OK"));
+ 
   } else if (command == "AT+RST") {
     Serial1.println(F("OK"));
     Serial.println(F("Sent response: OK"));
